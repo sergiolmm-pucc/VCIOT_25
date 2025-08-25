@@ -1,0 +1,16 @@
+
+Crie um diretorio
+        mkdir servidor
+        cd servidor
+
+Rode npm init
+        npm init -y
+
+Instale o modulo express
+npm install express        
+
+digite o programa
+
+inicie com
+        nome servidor.js
+        
