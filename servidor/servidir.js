@@ -13,6 +13,8 @@ app.get('/json', (req, res) => {
 });
 
 
+
+
 app.listen(port, () => {
     console.log(`Servidor a correr em http://localhost:${port}`);
 });
