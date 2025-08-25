@@ -13,4 +13,11 @@ digite o programa
 
 inicie com
         nome servidor.js
-        
+
+
+// para git com usuario diferente do global
+git config --local user.name "sergiolmm-pucc"
+git config --local user.email "sergio.marques@puc-campinas.edu.br"
+
+git config --local credential.helper ""
+git push origin master        
