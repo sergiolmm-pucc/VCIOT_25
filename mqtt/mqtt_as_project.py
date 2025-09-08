@@ -15,7 +15,7 @@ user = b'noturno'
 pwd = b'Cotuca25'
 # Local configuration
 config['ssid'] = 'casa'  # Optional on ESP8266
-config['wifi_pw'] = 'veneza03'
+config['wifi_pw'] = ''
 config['server'] = mqtt_server  # Change to suit e.g. 'iot.eclipse.org'
 config['user'] = user
 config['password'] = pwd
