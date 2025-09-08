@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cliente MQTT Web</title>
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      margin: auto;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px 0;
+      width: 100%;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    button {
+      cursor: pointer;
+      background: #0077cc;
+      color: white;
+      border: none;
+      transition: 0.3s;
+    }
+    .log {
+      margin-top: 15px;
+      padding: 10px;
+      background: #222;
+      color: #0f0;
+      font-family: monospace;
+      height: 200px;
+      overflow-y: auto;
+      border-radius: 6px;
+    }
+     button:hover {
+        background: #005fa3;
+        opacity: 0.85;
+    }
+    .row-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .btn-red { background: #e74c3c; flex: 1; }
+    .btn-green { background: #2ecc71; flex: 1; }
+    .btn-blue { background: #3498db; flex: 1; }
+    .btn-orange { background: #e67e22; flex: 1; }
+    .log {
+      margin-top: 15px;
+      padding: 10px;
+      background: #222;
+      color: #0f0;
+      font-family: monospace;
+      height: 200px;
+      overflow-y: auto;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Cliente MQTT Web</h2>
+    
+    <button id="btnConnect">🔌 Conectar</button>
+     <button id="btnDisconnect">⛔ Desconectar</button>
+    
+    <h3>Assinar tópico</h3>
+    <input type="text" id="subTopic" value="aula0509ns" placeholder="Digite o tópico para assinar">
+    <button id="btnSubscribe">📩 Assinar</button>
+    
+    <h3>Publicar mensagem</h3>
+    <input type="text" id="pubTopic" value="aula0509ns" placeholder="Tópico para publicar">
+    <input type="text" id="pubMessage" placeholder="Mensagem">
+    <button id="btnPublish">📤 Publicar</button>
+    
+    <!-- 4 botões coloridos -->
+    <div class="row-buttons">
+      <button id="btnRed" class="btn-red">Vermelho</button>
+      <button id="btnGreen" class="btn-green">Verde</button>
+      <button id="btnBlue" class="btn-blue">Azul</button>
+      <button id="btnOrange" class="btn-orange">Laranja</button>
+    </div>
+
+    <h3>Mensagens recebidas</h3>
+    <div id="log" class="log"></div>
+  </div>
+  
+  <script>
+    let client;
+    const logEl = document.getElementById("log");
+
+    function log(msg) {
+      logEl.innerHTML += msg + "<br>";
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    // Botão conectar
+    document.getElementById("btnConnect").addEventListener("click", () => {
+      if (client && client.connected) {
+        log("⚠️ Já conectado");
+        return;
+      }
+//aula0509ns
+      const options = {
+        username: "noturno",    // troque se precisar
+        password: "Cotuca25", // troque se precisar
+        reconnectPeriod: 1000,
+        protocolVersion: 4, // MQTT v3.1.1
+        clean: true
+        };
+
+  // Conexão segura via WSS
+  
+
+      // Exemplo com HiveMQ público
+      client = mqtt.connect("wss://73a3246b4410491692df6b23c34b84cc.s1.eu.hivemq.cloud:8884/mqtt", options);
+
+      client.on("connect", () => {
+        log("✅ Conectado ao broker!");
+      });
+
+      client.on("message", (topic, message) => {
+        log(`📨 [${topic}] ${message.toString()}`);
+      });
+
+      client.on("error", (err) => {
+        log("❌ Erro: " + err.message);
+      });
+      client.on("close", () => log("🔒 Conexão encerrada"));
+    });
+
+ // Desconectar
+    document.getElementById("btnDisconnect").addEventListener("click", () => {
+      if (client && client.connected) {
+        client.end();
+        log("⛔ Desconectado do broker");
+      } else {
+        log("⚠️ Não há conexão ativa");
+      }
+    });
+
+    // Botão assinar
+    document.getElementById("btnSubscribe").addEventListener("click", () => {
+      const topic = document.getElementById("subTopic").value;
+      if (!client || !client.connected) {
+        log("⚠️ Não conectado");
+        return;
+      }
+      if (topic) {
+        client.subscribe(topic, (err) => {
+          if (!err) {
+            log(`📩 Assinado em ${topic}`);
+          } else {
+            log("❌ Erro ao assinar");
+          }
+        });
+      }
+    });
+
+    // Botão publicar
+    document.getElementById("btnPublish").addEventListener("click", () => {
+      const topic = document.getElementById("pubTopic").value;
+      const message = document.getElementById("pubMessage").value;
+      if (!client || !client.connected) {
+        log("⚠️ Não conectado");
+        return;
+      }
+      if (topic && message) {
+        client.publish(topic, message);
+        log(`📤 Publicado em ${topic}: ${message}`);
+      }
+    });
+       // Botões coloridos (esqueleto)
+    document.getElementById("btnRed").addEventListener("click", () => {
+      log("🔴 Botão Vermelho clicado");
+      // aqui você pode publicar algo no MQTT ou outra ação
+    });
+
+    document.getElementById("btnGreen").addEventListener("click", () => {
+      log("🟢 Botão Verde clicado");
+      // ação aqui
+    });
+
+    document.getElementById("btnBlue").addEventListener("click", () => {
+      log("🔵 Botão Azul clicado");
+      // ação aqui
+    });
+
+    document.getElementById("btnOrange").addEventListener("click", () => {
+      log("🟠 Botão Laranja clicado");
+      // ação aqui
+    });
+  </script>
+</body>
+</html>
